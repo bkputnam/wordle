@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "noImplicitAny": true,
+      "sourceMap": true,
+      "strictNullChecks": true,
+      "outDir": "bin"
+    },
+    "include": ["src/**/*", "tests/**/*"]
+  }
