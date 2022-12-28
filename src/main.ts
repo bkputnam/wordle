@@ -1,47 +1,68 @@
 import { split, splitMin } from "./split";
 import { wordlist } from "./wordlist";
+import * as readline from 'node:readline/promises';
 
-let max = -Number.POSITIVE_INFINITY;
-let bestWord = '---';
+async function main() {
+    const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+    });
 
-for (const word of wordlist) {
-    const minGroupSize = splitMin(wordlist, word);
-    if (minGroupSize === 4) {
-        max = minGroupSize;
-        bestWord = word;
+    const guessedWords = new Set<string>();
+
+    console.log(
+        'The "current state" is whatever characters you know. ' +
+        'Use _ to indicate an unknown character, e.g. _____ for the ' +
+        'starting state, or _e_ch if you know those 3 letters.');
+
+    while (true) {
+        const currentState = await rl.question('\nWhat is the current state? ');
+        if (currentState.length !== 5) {
+            console.log('The current state must have exactly 5 letters. Please try again.');
+            continue;
+        }
+        const currentStateLetters = currentState.split('');
+
+        const filteredWordList = wordlist.filter((word) => {
+            if (guessedWords.has(word)) {
+                return false;
+            }
+            for (let i=0; i<currentStateLetters.length; i++) {
+                if (currentStateLetters[i] === '_' ||
+                    currentStateLetters[i] === word.charAt(i)) {
+                    continue;
+                }
+                return false;
+            }
+            return true;
+        });
+
+        let max = -Number.POSITIVE_INFINITY;
+        let bestWord = '---';
+
+        for (const word of filteredWordList) {
+            const minGroupSize = splitMin(wordlist, word);
+            if (minGroupSize > max) {
+                max = minGroupSize;
+                bestWord = word;
+            }
+        }
+        console.log(`You should guess: ${bestWord}`);
+        guessedWords.add(bestWord);
     }
 }
+main();
 
-console.log(`best word: ${bestWord}`);
-console.log(`minGroupSize: ${max}`);
+// let max = -Number.POSITIVE_INFINITY;
+// let bestWord = '---';
 
-// const splitResult = split(wordlist, 'belch');
-
-// let minMatchId: string|null = null;
-// let minSize = Number.POSITIVE_INFINITY;
-// let minExample: string|null = null;
-
-// let maxMatchId: string  |null = null;
-// let maxSize = -Number.POSITIVE_INFINITY;
-// let maxExample: string|null = null;
-
-// for (const [matchId, matches] of splitResult.entries()) {
-//     if (matches.size < minSize) {
-//         minSize = matches.size;
-//         minMatchId = matchId;
-//         minExample = [...matches][0];
-//     }
-//     if (matches.size > maxSize) {
-//         maxSize = matches.size;
-//         maxMatchId = matchId;
-//         maxExample = [...matches][0];
+// for (const word of wordlist) {
+//     const minGroupSize = splitMin(wordlist, word);
+//     if (minGroupSize === 4) {
+//         max = minGroupSize;
+//         bestWord = word;
 //     }
 // }
 
-// console.log(`min id: ${minMatchId}`);
-// console.log(`min size: ${minSize}`);
-// console.log(`min example: ${minExample}`);
-
-// console.log(`max id: ${maxMatchId}`);
-// console.log(`max size: ${maxSize}`);
-// console.log(`max example: ${maxExample}`);
+// console.log(`best word: ${bestWord}`);
+// console.log(`minGroupSize: ${max}`);

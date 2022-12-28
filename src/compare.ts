@@ -30,5 +30,7 @@ export class CompareResult {
 
 export function compare(word1: string, word2: string): CompareResult {
     assert(word1.length === word2.length);
-    return new CompareResult([...zip(word1, word2)].map(([c1, c2]) => c1 === c2 ? c1 : null));
+    return new CompareResult(
+        [...zip(word1, word2)]
+            .map(([c1, c2]) => c1 === c2 ? c1 : null));
 }
