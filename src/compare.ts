@@ -1,36 +1,60 @@
-import { assert } from "console";
-import { zip } from "./iter";
+
+export enum CompareValue {
+    NOT_USED,
+    WRONG_LOCATION,
+    RIGHT_LOCATION,
+}
 
 export class CompareResult {
-    private str: string|null;
+    constructor(readonly guess: string, readonly values: CompareValue[]) {}
 
-    constructor (private readonly places: Array<string|null>) {}
+    static fromString(guess: string, str: string) {
+        return new CompareResult(guess, str.split('').map((char) => {
+            switch (char) {
+                case '_':
+                    return CompareValue.NOT_USED;
+                case '?':
+                    return CompareValue.WRONG_LOCATION;
+                case '.':
+                    return CompareValue.RIGHT_LOCATION;
+                default:
+                    throw new Error(`Unexpected CompareResult string: ${char}`);
+            }
+        }));
+    }
+
+    valueStr(): string {
+        return this.values.map((value) => {
+            switch (value) {
+                case CompareValue.NOT_USED:
+                    return '_';
+                case CompareValue.WRONG_LOCATION:
+                    return '?';
+                case CompareValue.RIGHT_LOCATION:
+                    return '.';
+            }
+        }).join('');
+    }
 
     toString(): string {
-        if (!this.str) {
-            this.str = this.places.map((c) => c ?? '_').join('');
-        }
-        return this.str!;
-    }
-
-    static equals(c1: CompareResult, c2: CompareResult): boolean {
-        assert(c1.places.length === c2.places.length);
-        for (let i=0; i<c1.places.length; i++) {
-            if (c1.places[i] !== c2.places[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    equals(other: CompareResult): boolean {
-        return CompareResult.equals(this, other);
+        return `${this.guess}|${this.valueStr()}`;
     }
 }
 
-export function compare(word1: string, word2: string): CompareResult {
-    assert(word1.length === word2.length);
-    return new CompareResult(
-        [...zip(word1, word2)]
-            .map(([c1, c2]) => c1 === c2 ? c1 : null));
+export function compare(guess: string, actual: string): CompareResult {
+    if (guess.length !== actual.length) {
+        throw new Error(`Guess was wrong length: expected ${actual.length}, got ${guess.length}`);
+    }
+    const values: CompareValue[] = [];
+    for (let i=0; i<guess.length; i++) {
+        const char = guess.charAt(i);
+        if (actual.charAt(i) === char) {
+            values.push(CompareValue.RIGHT_LOCATION);
+        } else if (actual.indexOf(char) !== -1) {
+            values.push(CompareValue.WRONG_LOCATION);
+        } else {
+            values.push(CompareValue.NOT_USED);
+        }
+    }
+    return new CompareResult(guess, values);
 }
