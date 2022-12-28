@@ -3,7 +3,9 @@
       "noImplicitAny": true,
       "sourceMap": true,
       "strictNullChecks": true,
-      "outDir": "bin"
+      "outDir": "bin",
+      "target": "es2022",
+      "module": "CommonJS"
     },
     "include": ["src/**/*", "tests/**/*"]
   }
