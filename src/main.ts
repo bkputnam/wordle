@@ -3,17 +3,20 @@ import { wordlist } from "./wordlist";
 import * as readline from 'node:readline/promises';
 import { compare, CompareResult } from "./compare";
 import { StateFilters } from "./state_filter";
+import { group } from "node:console";
 
-let minExpectedRemainingWords = Number.POSITIVE_INFINITY;
-let bestWord = '---';
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
-for (const startingWord of wordlist) {
+function getExpectedRemainingWords(wordlist: string[], word: string): number {
     const groups = new Map<string, Set<string>>();
     for (const actualWord of wordlist) {
-        if (actualWord === startingWord) {
+        if (actualWord === word) {
             continue;
         }
-        const result = compare(startingWord, actualWord).valueStr();
+        const result = compare(word, actualWord).valueStr();
         if (!groups.has(result)) {
             groups.set(result, new Set<string>());
         }
@@ -26,67 +29,51 @@ for (const startingWord of wordlist) {
         sum += matchingWords.size * matchingWords.size;
         numWords += matchingWords.size;
     }
-    const expectedRemainingWords = sum / numWords;
-    console.log(`${startingWord}: ${expectedRemainingWords}`);
-    if (expectedRemainingWords < minExpectedRemainingWords) {
-        minExpectedRemainingWords = expectedRemainingWords;
-        bestWord = startingWord;
-    }
+    return sum / numWords;
 }
 
-console.log(`Best starting word: ${bestWord}`);
-console.log(`Expected remaining words: ${minExpectedRemainingWords}`);
+async function main() {
+    let minExpectedRemainingWords = Number.POSITIVE_INFINITY;
+    let startingWord = '---';
 
-// stateFilter.addCompareResult(CompareResult.fromString('__.__'));
-// console.log(stateFilter.matches('belch'));
+    for (const word of wordlist) {
+        const expectedRemainingWords = getExpectedRemainingWords(wordlist, word);
+        if (expectedRemainingWords < minExpectedRemainingWords) {
+            minExpectedRemainingWords = expectedRemainingWords;
+            startingWord = word;
+        }
+    }
 
-// async function main() {
-//     const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-//     });
+    console.log(`Starting word: ${startingWord}`);
 
-//     const guessedWords = new Set<string>();
+    let remainingWords = wordlist.filter((word) => word !== startingWord);
+    let currentWord = startingWord;
+    const stateFilters = new StateFilters();
+    while(remainingWords.length > 1) {
+        console.log('_ = char not used');
+        console.log('? = char used elsewhere');
+        console.log('. = char in correct location');
+        const compareResultStr = await rl.question('\nWhat is the current state? ');
+        stateFilters.addCompareResult(CompareResult.fromString(currentWord, compareResultStr));
+        console.log(stateFilters.toString());
+        remainingWords = remainingWords.filter((word) => stateFilters.matches(word));
+        console.log(remainingWords);
+        console.log(`Num remaining words: ${remainingWords.length}`);
+        // console.log(remainingWords);
 
-//     console.log(
-//         'The "current state" is whatever characters you know. ' +
-//         'Use _ to indicate an unknown character, e.g. _____ for the ' +
-//         'starting state, or _e_ch if you know those 3 letters.');
+        let nextWord = '';
+        minExpectedRemainingWords = Number.POSITIVE_INFINITY;
 
-//     while (true) {
-//         const currentState = await rl.question('\nWhat is the current state? ');
-//         if (currentState.length !== 5) {
-//             console.log('The current state must have exactly 5 letters. Please try again.');
-//             continue;
-//         }
-//         const currentStateLetters = currentState.split('');
-
-//         const filteredWordList = wordlist.filter((word) => {
-//             if (guessedWords.has(word)) {
-//                 return false;
-//             }
-//             for (let i=0; i<currentStateLetters.length; i++) {
-//                 if (currentStateLetters[i] === '_' ||
-//                     currentStateLetters[i] === word.charAt(i)) {
-//                     continue;
-//                 }
-//                 return false;
-//             }
-//             return true;
-//         });
-
-//         let max = -Number.POSITIVE_INFINITY;
-//         let bestWord = '---';
-
-//         for (const word of filteredWordList) {
-//             const minGroupSize = splitMin(wordlist, word);
-//             if (minGroupSize > max) {
-//                 max = minGroupSize;
-//                 bestWord = word;
-//             }
-//         }
-//         console.log(`You should guess: ${bestWord}`);
-//         guessedWords.add(bestWord);
-//     }
-// }
-// main();
+        for (const candidateWord of remainingWords) {
+            const expectedRemainingWords = getExpectedRemainingWords(remainingWords, candidateWord);
+            if (expectedRemainingWords < minExpectedRemainingWords) {
+                minExpectedRemainingWords = expectedRemainingWords;
+                nextWord = candidateWord;
+            }
+        }
+        currentWord = nextWord;
+        console.log(`Next word: ${nextWord}`);
+    }
+    console.log('Done.');
+}
+main();

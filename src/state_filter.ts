@@ -9,8 +9,12 @@ class CharNeverUsed implements Filter {
 
     matches(str: string): boolean {
         const result = str.indexOf(this.char) === -1
-        console.log(`CharNeverUsed(${this.char}: ${result})`)
+        // console.log(`CharNeverUsed(${this.char}: ${result})`);
         return result;
+    }
+
+    toString() {
+        return `CharNeverUsed(${this.char})`;
     }
 }
 
@@ -22,8 +26,12 @@ class CharUsedElsewhere implements Filter {
     matches(str: string): boolean {
         const result = str.indexOf(this.char) !== -1 &&
             str.charAt(this.notIndex) !== this.char;
-        console.log(`CharUsedElsewhere(${this.char}, ${this.notIndex}): ${result}`);
+        // console.log(`CharUsedElsewhere(${this.char}, ${this.notIndex}): ${result}`);
         return result;
+    }
+
+    toString() {
+        return `CharUsedElsewhere(${this.char}, ${this.notIndex})`;
     }
 }
 
@@ -34,8 +42,12 @@ class CharAtIndex implements Filter {
 
         matches(str: string): boolean {
         const result = str.charAt(this.index) === this.char;
-        console.log(`CharAtIndex(${this.char}, ${this.index}): ${result}`);
+        // console.log(`CharAtIndex(${this.char}, ${this.index}): ${result}`);
         return result;
+    }
+
+    toString() {
+        return `CharAtIndex(${this.char}, ${this.index})`;
     }
 }
 
@@ -68,5 +80,10 @@ export class StateFilters {
 
     fork(): StateFilters {
         return new StateFilters([...this.filters]);
+    }
+
+    toString() {
+        const filterStr = this.filters.map(filter => '  ' + filter.toString()).join('\n');
+        return `[${filterStr}]`;
     }
 }
