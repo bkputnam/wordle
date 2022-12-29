@@ -64,11 +64,15 @@ async function main() {
         let nextWord = '';
         minExpectedRemainingWords = Number.POSITIVE_INFINITY;
 
-        for (const candidateWord of remainingWords) {
-            const expectedRemainingWords = getExpectedRemainingWords(remainingWords, candidateWord);
-            if (expectedRemainingWords < minExpectedRemainingWords) {
-                minExpectedRemainingWords = expectedRemainingWords;
-                nextWord = candidateWord;
+        if (remainingWords.length === 1) {
+            nextWord = remainingWords[0];
+        } else {
+            for (const candidateWord of wordlist) {
+                const expectedRemainingWords = getExpectedRemainingWords(remainingWords, candidateWord);
+                if (expectedRemainingWords < minExpectedRemainingWords) {
+                    minExpectedRemainingWords = expectedRemainingWords;
+                    nextWord = candidateWord;
+                }
             }
         }
         currentWord = nextWord;
