@@ -3,31 +3,29 @@ import { wordlist } from "./wordlist";
 import * as readline from 'node:readline/promises';
 import { compare, CompareResult } from "./compare";
 import { StateFilters } from "./state_filter";
-import { group } from "node:console";
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
+const groups = new Array(Math.pow(3, 5));
+
 function getExpectedRemainingWords(wordlist: string[], word: string): number {
-    const groups = new Map<string, Set<string>>();
-    for (const actualWord of wordlist) {
-        if (actualWord === word) {
-            continue;
-        }
-        const result = compare(word, actualWord).valueStr();
-        if (!groups.has(result)) {
-            groups.set(result, new Set<string>());
-        }
-        groups.get(result)!.add(actualWord);
+    groups.fill(0);
+    const len = wordlist.length;
+    let actualWord = '';
+    for (let i=0; i<len; i++) {
+        actualWord = wordlist[i];
+        const result = compare(word, actualWord).valueNum();
+        groups[result]++;
     }
 
     let sum = 0;
     let numWords = 0;
-    for (const matchingWords of groups.values()) {
-        sum += matchingWords.size * matchingWords.size;
-        numWords += matchingWords.size;
+    for (const size of groups) {
+        sum += size * size;
+        numWords += size;
     }
     return sum / numWords;
 }
@@ -36,18 +34,26 @@ async function main() {
     let minExpectedRemainingWords = Number.POSITIVE_INFINITY;
     let startingWord = '---';
 
-    for (const word of wordlist) {
+    const start = performance.now();
+
+    const len = wordlist.length;
+    for (let i=0; i<len; i++) {
+        const word = wordlist[i];
         const expectedRemainingWords = getExpectedRemainingWords(wordlist, word);
         if (expectedRemainingWords < minExpectedRemainingWords) {
             minExpectedRemainingWords = expectedRemainingWords;
             startingWord = word;
         }
     }
+    const end = performance.now();
+    console.log(`Elapsed: ${(end - start) / 1000}`);
 
     console.log(`Starting word: ${startingWord}`);
 
     let remainingWords = wordlist.filter((word) => word !== startingWord);
+    let remainingWordsSet = new Set(remainingWords);
     let currentWord = startingWord;
+    let nextWordIsPlausible = false;
     const stateFilters = new StateFilters();
     while(remainingWords.length > 1) {
         console.log('_ = char not used');
@@ -57,6 +63,7 @@ async function main() {
         stateFilters.addCompareResult(CompareResult.fromString(currentWord, compareResultStr));
         console.log(stateFilters.toString());
         remainingWords = remainingWords.filter((word) => stateFilters.matches(word));
+        remainingWordsSet = new Set(remainingWords);
         console.log(remainingWords);
         console.log(`Num remaining words: ${remainingWords.length}`);
         // console.log(remainingWords);
@@ -68,10 +75,13 @@ async function main() {
             nextWord = remainingWords[0];
         } else {
             for (const candidateWord of wordlist) {
+                const candidateIsPlausible = remainingWordsSet.has(candidateWord);
                 const expectedRemainingWords = getExpectedRemainingWords(remainingWords, candidateWord);
-                if (expectedRemainingWords < minExpectedRemainingWords) {
+                if (expectedRemainingWords < minExpectedRemainingWords ||
+                    (expectedRemainingWords === minExpectedRemainingWords && candidateIsPlausible)) {
                     minExpectedRemainingWords = expectedRemainingWords;
                     nextWord = candidateWord;
+                    nextWordIsPlausible = candidateIsPlausible;
                 }
             }
         }

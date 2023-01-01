@@ -6,7 +6,8 @@
   "scripts": {
     "test": "rm -rf bin/* && tsc && npx jasmine './bin/*_test.js'",
     "testDebug": "rm -rf bin/* && tsc && node --inspect-brk --enable-source-maps node_modules/jasmine/bin/jasmine.js 'bin/*spec.js'",
-    "main": "rm -rf bin/* && tsc && node bin/main.js"
+    "main": "rm -rf bin/* && tsc && node bin/main.js",
+    "mainDebug": "rm -rf bin/* && tsc && node --inspect-brk --enable-source-maps bin/main.js"
   },
   "author": "",
   "license": "ISC",

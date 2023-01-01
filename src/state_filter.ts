@@ -1,4 +1,4 @@
-import { CompareResult, CompareValue } from "./compare";
+import { compare, CompareResult, CompareValue } from "./compare";
 
 interface Filter {
     matches(str: string): boolean;
@@ -60,20 +60,20 @@ class CharAtIndex implements Filter {
 }
 
 export class StateFilters {
-    private readonly unknownLetters = [0, 1, 2, 3, 4];
     private readonly filters: Filter[] = [];
 
-    private getFilter(char: string, index: number, value: CompareValue): Filter {
+    private createFilter(char: string, index: number, value: CompareValue, unknownLetters: number[]): Filter {
         switch (value) {
             case CompareValue.NOT_USED:
-                return new CharNeverUsed(char, [...this.unknownLetters]);
+                return new CharNeverUsed(char, unknownLetters);
             case CompareValue.WRONG_LOCATION:
-                return new CharUsedElsewhere(char, index, [...this.unknownLetters]);
+                return new CharUsedElsewhere(char, index, unknownLetters);
             case CompareValue.RIGHT_LOCATION:
-                const indexIndex = this.unknownLetters.indexOf(index);
-                if (indexIndex !== -1) {
-                    this.unknownLetters.splice(indexIndex, 1);
-                }
+                // I don't remember why this was necessary
+                // const indexIndex = unknownLetters.indexOf(index);
+                // if (indexIndex !== -1) {
+                //     unknownLetters.splice(indexIndex, 1);
+                // }
                 return new CharAtIndex(char, index);
             default:
                 throw new Error(`Unknown CompareValue: ${value}`);
@@ -81,17 +81,15 @@ export class StateFilters {
     }
 
     addCompareResult(compareResult: CompareResult) {
+        const unknownLetters = [];
         for (const [index, value] of compareResult.values.entries()) {
-            if (value === CompareValue.RIGHT_LOCATION) {
-                const char = compareResult.guess.charAt(index);
-                this.filters.push(this.getFilter(char, index, value));
+            if (value !== CompareValue.RIGHT_LOCATION) {
+                unknownLetters.push(index);
             }
         }
         for (const [index, value] of compareResult.values.entries()) {
-            if (value !== CompareValue.RIGHT_LOCATION) {
-                const char = compareResult.guess.charAt(index);
-                this.filters.push(this.getFilter(char, index, value));
-            }
+            const char = compareResult.guess.charAt(index);
+            this.filters.push(this.createFilter(char, index, value, unknownLetters));
         }
     }
 

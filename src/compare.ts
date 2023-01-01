@@ -1,6 +1,6 @@
 
 export enum CompareValue {
-    NOT_USED,
+    NOT_USED = 0,
     WRONG_LOCATION,
     RIGHT_LOCATION,
 }
@@ -34,6 +34,17 @@ export class CompareResult {
                     return '.';
             }
         }).join('');
+    }
+
+    valueNum(): number {
+        let result = 0;
+        let power = 1; // 3^0 == 1
+        for (let index=0; index<this.values.length; index++) {
+            const digit = this.values[index] as number;
+            result += power * digit;
+            power *= 3;
+        }
+        return result;
     }
 
     toString(): string {
