@@ -5,7 +5,7 @@
   "main": "src/main.ts",
   "scripts": {
     "test": "rm -rf bin/* && tsc && npx jasmine './bin/*_test.js'",
-    "testDebug": "rm -rf bin/* && tsc && node --inspect-brk --enable-source-maps node_modules/jasmine/bin/jasmine.js 'bin/*spec.js'",
+    "testDebug": "rm -rf bin/* && tsc && node --inspect-brk --enable-source-maps node_modules/jasmine/bin/jasmine.js 'bin/*_test.js'",
     "main": "rm -rf bin/* && tsc && node bin/main.js",
     "mainDebug": "rm -rf bin/* && tsc && node --inspect-brk --enable-source-maps bin/main.js"
   },
