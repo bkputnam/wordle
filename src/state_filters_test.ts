@@ -56,4 +56,16 @@ describe('StateFilters', () => {
         expect(ordinalIndex('mississippi', 'iss', 1)).toBe(4);
         expect(ordinalIndex('mississippi', 'iss', 2)).toBe(-1);
     });
+    it('koala', () => {
+       const stateFilters = new StateFilters();
+        stateFilters.addCompareResult(
+            CompareResult.fromString('lares', '??___'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('aloin', '???__'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('yclad', '__??_'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('baaps', '_?.__'));
+       expect(stateFilters.matches('koala')).toBeTrue();
+    });
 });
