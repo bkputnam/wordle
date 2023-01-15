@@ -10,6 +10,7 @@
     "main": "rm -rf bin/* && tsc && node bin/main.js",
     "mainDebug": "rm -rf bin/* && tsc && node --inspect-brk --enable-source-maps bin/main.js"
   },
+  "type": "module",
   "author": "",
   "license": "ISC",
   "devDependencies": {

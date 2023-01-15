@@ -1,4 +1,4 @@
-import { compare, CompareResult, CompareValue } from "./compare";
+import { compare, CompareResult, CompareValue } from "./compare.js";
 
 describe('Compare', () => {
     it('should compute valueNum correctly', () => {

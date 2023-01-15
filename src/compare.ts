@@ -60,6 +60,11 @@ export class CompareResult {
     valueNum(): number {
         return CompareResult.valueNum(this.values);
     }
+    
+    isAllCorrect() {
+        return this.values.every(
+            (value) => value === CompareValue.RIGHT_LOCATION);
+    }
 
     toString(): string {
         return `${this.guess}|${this.valueStr()}`;

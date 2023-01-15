@@ -1,6 +1,6 @@
 import { stat } from "fs";
-import { CompareResult } from "./compare";
-import { StateFilters } from "./state_filters";
+import { CompareResult } from "./compare.js";
+import { StateFilters } from "./state_filters.js";
 
 describe('StateFilters', () => {
     it('should filter known chars', () => {

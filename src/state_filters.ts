@@ -1,5 +1,5 @@
-import { compare, CompareResult, CompareValue } from "./compare";
-import { range } from "./iter";
+import { compare, CompareResult, CompareValue } from "./compare.js";
+import { range } from "./iter.js";
 
 interface Filter {
     matches(str: string): boolean;
