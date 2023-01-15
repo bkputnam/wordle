@@ -1,7 +1,8 @@
 import { stat } from "fs";
 import { CompareResult } from "./compare";
-import { StateFilters } from "./state_filter";
+import { StateFilters, TEST_ONLY } from "./state_filter";
 
+const {ordinalIndex} = TEST_ONLY;
 
 describe('StateFilters', () => {
     it('should filter known chars', () => {
@@ -46,5 +47,35 @@ describe('StateFilters', () => {
         stateFilters.addCompareResult(
             CompareResult.fromString('suete', '.___.'));
         expect(stateFilters.matches('spire')).toBeTrue();
+    });
+
+    it('should treat 2nd letters correctly', () => {
+        const stateFilters = new StateFilters();
+        stateFilters.addCompareResult(
+            CompareResult.fromString('arbor', '??_?_'));
+        expect(stateFilters.matches('opera')).toBeTrue();
+    });
+
+    it('ordinalIndex should work as expected', () => {
+        expect(ordinalIndex('arbor', 'r', 0)).toBe(1);
+        expect(ordinalIndex('arbor', 'r', 1)).toBe(4);
+        expect(ordinalIndex('arbor', 'r', 2)).toBe(-1);
+
+        expect(ordinalIndex('mississippi', 'iss', 0)).toBe(1);
+        expect(ordinalIndex('mississippi', 'iss', 1)).toBe(4);
+        expect(ordinalIndex('mississippi', 'iss', 2)).toBe(-1);
+    });
+
+    it('koala', () => {
+       const stateFilters = new StateFilters();
+        stateFilters.addCompareResult(
+            CompareResult.fromString('lares', '??___'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('aloin', '???__'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('yclad', '__??_'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('baaps', '_?.__'));
+       expect(stateFilters.matches('koala')).toBeTrue();
     });
 });

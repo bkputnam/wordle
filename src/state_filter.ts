@@ -4,20 +4,40 @@ interface Filter {
     matches(str: string): boolean;
 }
 
+/**
+ * Get the index of the nth instance of subStr
+ */
+function nthIndex(str: string, subStr: string, n: number): number {
+    let result: number|undefined = undefined;
+    let searchStart = 0;
+    for (let i=0; i<=n; i++) {
+        result = str.indexOf(subStr, searchStart);
+        if (result === -1) {
+            break;
+        }
+        searchStart = result + subStr.length;
+    }
+    if (result === undefined) {
+        throw new Error(`Index = undefined (n=${n})`);
+    }
+    return result;
+}
+
 class CharNeverUsed implements Filter {
     constructor(
+        // Is this the 0th/1st/2nd/etc instance of char?
+        private readonly index: number,
         private readonly char: string,
         private readonly indexes: number[]) {}
 
     matches(str: string): boolean {
-        const result =
-            !this.indexes.some((index) => str.charAt(index) === this.char);
+        const result = nthIndex(str, this.char, this.index) === -1;
         // console.log(`${this.toString()} = ${result}`);
         return result;
     }
 
     toString() {
-        return `CharNeverUsed(${this.char}, [${this.indexes}])`;
+        return `CharNeverUsed(${this.index}, ${this.char}, [${this.indexes}])`;
     }
 }
 
@@ -25,21 +45,23 @@ class CharUsedElsewhere implements Filter {
     private readonly indexes: number[];
 
     constructor(
-        private readonly char: string, 
+        // Is this the 0th/1st/2nd/etc instance of char?
+        private readonly index: number,
+        private readonly char: string,
         private readonly notIndex: number,
         indexes: number[]) {
             this.indexes = indexes.filter((index) => index !== notIndex);
         }
 
     matches(str: string): boolean {
-        const result = str.indexOf(this.char) !== -1 &&
-            this.indexes.some((index) => str.charAt(index) === this.char);
+        const nthCharIndex = nthIndex(str, this.char, this.index);
+        const result = this.indexes.includes(nthCharIndex);
         // console.log(`${this.toString()} = ${result}`);
         return result;
     }
 
     toString() {
-        return `CharUsedElsewhere(${this.char}, ${this.notIndex}, [${this.indexes}])`;
+        return `CharUsedElsewhere(${this.index}, ${this.char}, ${this.notIndex}, [${this.indexes}])`;
     }
 }
 
@@ -62,18 +84,13 @@ class CharAtIndex implements Filter {
 export class StateFilters {
     private readonly filters: Filter[] = [];
 
-    private createFilter(char: string, index: number, value: CompareValue, unknownLetters: number[]): Filter {
+    private createFilter(nthSighting: number, char: string, index: number, value: CompareValue, unknownLetters: number[]): Filter {
         switch (value) {
             case CompareValue.NOT_USED:
-                return new CharNeverUsed(char, unknownLetters);
+                return new CharNeverUsed(nthSighting, char, unknownLetters);
             case CompareValue.WRONG_LOCATION:
-                return new CharUsedElsewhere(char, index, unknownLetters);
+                return new CharUsedElsewhere(nthSighting, char, index, unknownLetters);
             case CompareValue.RIGHT_LOCATION:
-                // I don't remember why this was necessary
-                // const indexIndex = unknownLetters.indexOf(index);
-                // if (indexIndex !== -1) {
-                //     unknownLetters.splice(indexIndex, 1);
-                // }
                 return new CharAtIndex(char, index);
             default:
                 throw new Error(`Unknown CompareValue: ${value}`);
@@ -87,9 +104,13 @@ export class StateFilters {
                 unknownLetters.push(index);
             }
         }
+        const nthSightingMap = new Map<string, number>();
         for (const [index, value] of compareResult.values.entries()) {
             const char = compareResult.guess.charAt(index);
-            this.filters.push(this.createFilter(char, index, value, unknownLetters));
+            let nthSighting: number = nthSightingMap.has(char) ?
+                nthSightingMap.get(char)! + 1 : 0;
+            nthSightingMap.set(char, nthSighting);
+            this.filters.push(this.createFilter(nthSighting, char, index, value, unknownLetters));
         }
     }
 
@@ -101,4 +122,8 @@ export class StateFilters {
         const filterStr = this.filters.map(filter => '  ' + filter.toString()).join('\n');
         return `[${filterStr}]`;
     }
+}
+
+export const TEST_ONLY = {
+    ordinalIndex: nthIndex,
 }

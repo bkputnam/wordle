@@ -1,7 +1,6 @@
-import { split, splitMin } from "./split";
 import { wordlist } from "./wordlist";
 import * as readline from 'node:readline/promises';
-import { compare, CompareResult } from "./compare";
+import { compareAsNum, CompareResult } from "./compare";
 import { StateFilters } from "./state_filter";
 
 const rl = readline.createInterface({
@@ -17,7 +16,7 @@ function getExpectedRemainingWords(wordlist: string[], word: string): number {
     let actualWord = '';
     for (let i=0; i<len; i++) {
         actualWord = wordlist[i];
-        const result = compare(word, actualWord).valueNum();
+        const result = compareAsNum(word, actualWord);
         groups[result]++;
     }
 
