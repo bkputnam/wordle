@@ -11,3 +11,13 @@ export function* zip<T, U>(iter1: Iterable<T>, iter2: Iterable<U>): Iterable<[T,
         yield [value1, value2];
     }
 }
+
+export function range(stop: number): Iterable<number>;
+export function range(start: number, stop: number): Iterable<number>;
+export function* range(a: number, b?: number): Iterable<number> {
+    const [start, stop] = arguments.length === 1 ?
+        [0, a] : [a, b!];
+    for (let i = start; i < stop; i++) {
+        yield i;
+    }
+}

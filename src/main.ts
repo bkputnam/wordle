@@ -1,7 +1,7 @@
 import { wordlist } from "./wordlist";
 import * as readline from 'node:readline/promises';
 import { compareAsNum, CompareResult } from "./compare";
-import { StateFilters } from "./state_filter";
+import { StateFilters } from "./state_filters";
 
 const rl = readline.createInterface({
     input: process.stdin,

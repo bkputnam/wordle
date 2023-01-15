@@ -15,7 +15,6 @@ describe('Compare', () => {
         expect(compare.valueNum()).toBe((1 * 9) + (2 * 27));
     });
     it('should handle double letters', () => {
-        debugger;
         const result = compare('arbor', 'opera');
         expect(result.values).toEqual([
             CompareValue.WRONG_LOCATION,
