@@ -38,4 +38,13 @@ describe('StateFilters', () => {
             CompareResult.fromString('cabal', '?.___'));
         expect(stateFilters.matches('havoc')).toBeTrue();
     });
+
+    it('spire', () => {
+        const stateFilters = new StateFilters();
+        stateFilters.addCompareResult(
+            CompareResult.fromString('lares', '__???'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('suete', '.___.'));
+        expect(stateFilters.matches('spire')).toBeTrue();
+    });
 });
