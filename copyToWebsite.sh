@@ -3,10 +3,16 @@
 SRC='./bin'
 DEST='../brian-putnam.com/www/wordle'
 
+files=(compare.js iter.js state_filters.js wordlist.js state_filters.js)
+
 npm run build
-cp $SRC/compare.js $DEST/
-cp $SRC/iter.js $DEST/
-cp $SRC/state_filters.js $DEST/
-cp $SRC/wordlist.js $DEST/
-cp $SRC/state_filters.js $DEST/
+for i in "${files[@]}"; do
+    cmd="cp $SRC/$i $DEST/"
+    echo $cmd
+    $($cmd)
+
+    cmd="cp $SRC/$i.map $DEST/"
+    echo $cmd
+    $($cmd)
+done
 
