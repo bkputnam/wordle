@@ -4,7 +4,7 @@ BIN='./bin'
 SRC='./src'
 DEST='../brian-putnam.com/www/wordle'
 
-files=(compare iter state_filters wordlist state_filters)
+files=( compare iter state_filters wordlist state_filters next_guess )
 
 npm run build
 for i in "${files[@]}"; do
