@@ -54,4 +54,34 @@ describe('Compare', () => {
             CompareValue.NOT_USED,
         ]);
     });
+    it('lares -> water', () => {
+        const result = compare('lares', 'water');
+        expect(result.values).toEqual([
+            CompareValue.NOT_USED,
+            CompareValue.RIGHT_LOCATION,
+            CompareValue.WRONG_LOCATION,
+            CompareValue.RIGHT_LOCATION,
+            CompareValue.NOT_USED,
+        ]);
+    });
+    it('kydst -> water', () => {
+        const result = compare('kydst', 'water');
+        expect(result.values).toEqual([
+            CompareValue.NOT_USED,
+            CompareValue.NOT_USED,
+            CompareValue.NOT_USED,
+            CompareValue.NOT_USED,
+            CompareValue.WRONG_LOCATION,
+        ]);
+    });
+    it('rater -> water', () => {
+        const result = compare('rater', 'water');
+        expect(result.values).toEqual([
+            CompareValue.NOT_USED,
+            CompareValue.RIGHT_LOCATION,
+            CompareValue.RIGHT_LOCATION,
+            CompareValue.RIGHT_LOCATION,
+            CompareValue.RIGHT_LOCATION,
+        ]);
+    });
 });

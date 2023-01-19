@@ -75,4 +75,16 @@ describe('StateFilters', () => {
             CompareResult.fromString('baaps', '_?.__'));
        expect(stateFilters.matches('koala')).toBeTrue();
     });
+
+    it('water', () => {
+        debugger;
+        const stateFilters = new StateFilters();
+        stateFilters.addCompareResult(
+            CompareResult.fromString('lares', '_.?._'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('kydst', '____?'));
+        stateFilters.addCompareResult(
+            CompareResult.fromString('rater', '_....'));
+       expect(stateFilters.matches('water')).toBeTrue();
+    });
 });

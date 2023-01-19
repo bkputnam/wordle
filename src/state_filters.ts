@@ -100,7 +100,7 @@ export class StateFilters {
 
     addCompareResult(compareResult: CompareResult) {
         const remainingIndexes = [...range(5)];
-        const compareValues = [...compareResult.values.entries()];
+        const compareValues = [...compareResult.values.entries()].reverse();
         const letters = compareResult.guess.split('');
         const filters: Array<Filter|undefined> = new Array(5);
         filters.fill(undefined);
