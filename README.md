@@ -4,8 +4,10 @@ My attempts at programmatically generating good wordle guesses. To run:
 
 1. Install NodeJS. Recommended route (even though this repo doesn't
    need a specific version of node):
+
     1a. [Install `nvm`](https://github.com/nvm-sh/nvm)
     1b. `nvm install node`
+
 2. Install package deps:
 
     ```
