@@ -2,8 +2,21 @@
 
 My attempts at programmatically generating good wordle guesses. To run:
 
+1. Install NodeJS. Recommended route (even though this repo doesn't
+   need a specific version of node):
+
+    1. [Install `nvm`](https://github.com/nvm-sh/nvm)
+    2. `nvm install node`
+
+2. Install package deps:
+
 ```
 npm install
+```
+
+3. Run `main`:
+
+```
 npm run main
 ```
 

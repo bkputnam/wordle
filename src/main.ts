@@ -9,40 +9,27 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-const groups = new Array(Math.pow(3, 5));
-
 async function main() {
-
-    const startingWord = getNextGuess(wordlist);
-    console.log(`Starting word: ${startingWord}`);
-
-    let remainingWords = wordlist.filter((word) => word !== startingWord);
-    let remainingWordsSet = new Set(remainingWords);
-    let currentWord = startingWord;
+    let currentGuess = getNextGuess(wordlist);
+    let remainingWords = wordlist;
     const stateFilters = new StateFilters();
-    while(remainingWords.length > 1) {
-        console.log('_ = char not used');
-        console.log('? = char used elsewhere');
-        console.log('. = char in correct location');
+    while (remainingWords.length > 1) {
         const compareResultStr = await rl.question('\nWhat is the current state? ');
-        stateFilters.addCompareResult(CompareResult.fromString(currentWord, compareResultStr));
-        console.log(stateFilters.toString());
-        remainingWords = remainingWords.filter((word) => stateFilters.matches(word));
-        remainingWordsSet = new Set(remainingWords);
-        console.log(remainingWords);
-        console.log(`Num remaining words: ${remainingWords.length}`);
-        // console.log(remainingWords);
-
-        let nextWord = '';
-
-        if (remainingWords.length === 1) {
-            nextWord = remainingWords[0];
-        } else {
-            nextWord = getNextGuess(remainingWords);
+        stateFilters.addCompareResult(CompareResult.fromString(currentGuess, compareResultStr));
+        remainingWords = remainingWords.filter(
+            (word) => stateFilters.matches(word));
+        if (remainingWords.length === 0) {
+            throw new Error('No remaining words');
         }
-        currentWord = nextWord;
-        console.log(`Next word: ${nextWord}`);
+        if (remainingWords.length === 1) {
+            currentGuess = remainingWords[0];
+            console.log(`Solved wordle: "${currentGuess}"`);
+            return;
+        }
+        console.log(remainingWords);
+        console.log(`${remainingWords.length} words remaining`);
+
+        currentGuess = getNextGuess(remainingWords);
     }
-    console.log('Done.');
 }
 main();
